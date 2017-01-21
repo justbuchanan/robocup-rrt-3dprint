@@ -2,10 +2,11 @@ include <out.scad>;
 
 $fn = 90; // high resolution
 
-LineHeight = 0.02*meter;
-LineWidth = 0.02*meter;
-FieldThickness = 0.05*meter;
+LineHeight = 0.03*meter;
+LineWidth = 0.03*meter;
+FieldThickness = 0.02*meter;
 Intersect = 0.001 * meter;
+Noderadius = LineWidth * 0.5;
 
 
 module robot(pos, focused=false) {
@@ -46,7 +47,7 @@ module line(from, to, sizeMultiplier=1) {
 
 module node(pos) {
     translate([pos[0], pos[1], 0])
-    cylinder(r=LineWidth, h=LineHeight);
+    cylinder(r=Noderadius, h=LineHeight);
 }
 // first print: 0.1 - way too small, can't see the rrt lines at all
 // second print: close to right @ 0.03 scale
@@ -83,7 +84,7 @@ scale(scaled_length / FieldLength) {
 
         // draw lines in the solution thicker than the rest
         for (i = [0:len(RRT_Solution)-2]) {
-            line(RRT_Solution[i], RRT_Solution[i+1], 2);
+            line(RRT_Solution[i], RRT_Solution[i+1], 1.5);
         }
     }
 }
