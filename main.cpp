@@ -12,8 +12,9 @@ using namespace Eigen;
 
 const float meter = 1000;
 
-const float RobotRadius = 0.09 * meter;
-const float RobotHeight = 0.15 * meter;
+const float sizeScaleUp = 2;
+const float RobotRadius = 0.09 * meter * sizeScaleUp;
+const float RobotHeight = 0.15 * meter * sizeScaleUp;
 
 const float scale = 0.6;
 const float FieldLength = 6.05 * meter * scale;
@@ -77,8 +78,7 @@ string line2scad(Line l) {
   return o.str();
 }
 
-void collectTreeLines(const Tree<Vector2f> &rrt,
-                      vector<Line> *linesOut) {
+void collectTreeLines(const Tree<Vector2f> &rrt, vector<Line> *linesOut) {
   for (const Node<Vector2f> *node : rrt.allNodes()) {
     if (node->parent()) {
       linesOut->push_back({node->state(), node->parent()->state()});
@@ -86,8 +86,9 @@ void collectTreeLines(const Tree<Vector2f> &rrt,
   }
 }
 
-template<class T>
-void scad_array(fstream*out, string name, const vector<T>& items, function<string(T)> printer) {
+template <class T>
+void scad_array(fstream *out, string name, const vector<T> &items,
+                function<string(T)> printer) {
   *out << name << " = [" << endl;
   for (const T &x : items) {
     *out << "  " << printer(x) << "," << endl;
@@ -102,7 +103,7 @@ int main(int argc, char **argv) {
   // setup rrt
   auto stateSpace = make_shared<RobotStateSpace>();
   BiRRT<Eigen::Vector2f> biRRT(stateSpace);
-  biRRT.setStepSize(0.1 * meter);
+  biRRT.setStepSize(0.15 * meter);
   biRRT.setStartState(start);
   biRRT.setGoalState(goal);
   biRRT.setGoalBias(0.1);
@@ -114,16 +115,17 @@ int main(int argc, char **argv) {
 
   // override using a known seed for repeatable results
   // note: comment this out to use the random seed
-  seed = 1484970367;
+  // seed = 1484970367;
+  seed = 1484997019;
 
   srand(seed);
   cout << "INFO: using random seed: " << seed << endl;
 
   // robots placed to challenge the rrt
   vector<Vector2f> otherRobots = {
-      {0.5 * meter, 1 * meter},   {1 * meter, 0.5 * meter},
-      {0.9 * meter, 1.2 * meter}, {1.3 * meter, 2 * meter},
-      {2 * meter, 2 * meter},
+      {0.5 * meter, 1.2 * meter}, {1 * meter, 0.9 * meter},
+      {1.5 * meter, 1.2 * meter}, {1.3 * meter, 2 * meter},
+      {2.2 * meter, 2.1 * meter},
   };
 
   // mark them as obstacles for the rrt
@@ -173,8 +175,10 @@ int main(int argc, char **argv) {
   vector<Vector2f> nodes;
   auto s = biRRT.startTree().allNodes();
   auto g = biRRT.goalTree().allNodes();
-  transform(s.begin(), s.end(), back_inserter(nodes), [](Node<Vector2f> * n) {return n->state();});
-  transform(g.begin(), g.end(), back_inserter(nodes), [](Node<Vector2f> * n) {return n->state();});
+  transform(s.begin(), s.end(), back_inserter(nodes),
+            [](Node<Vector2f> *n) { return n->state(); });
+  transform(g.begin(), g.end(), back_inserter(nodes),
+            [](Node<Vector2f> *n) { return n->state(); });
   scad_array<Vector2f>(&scadfile, "RRT_Nodes", nodes, vec2scad);
 
   scadfile.close();
