@@ -110,6 +110,16 @@ scale(scaled_length / FieldLength) {
         scale([s*sx,s,s])
         import("goal.stl");
 
+        wall_h = 30;
+        cube([wall_h, FieldLength, wall_h]);
+
+        translate([FieldWidth - wall_h, 0, 0])
+        cube([wall_h, FieldLength, wall_h]);
+
+        cube([FieldWidth, wall_h, wall_h]);
+
+        translate([0, FieldLength - wall_h, 0])
+        cube([FieldWidth, wall_h, wall_h]);
     }
 }
 
