@@ -12,13 +12,13 @@ using namespace Eigen;
 
 const float meter = 1000;
 
-const float sizeScaleUp = 2;
+const float sizeScaleUp = 1.5;
 const float RobotRadius = 0.09 * meter * sizeScaleUp;
 const float RobotHeight = 0.15 * meter * sizeScaleUp;
 
 const float scale = 0.6;
-const float FieldLength = 6.05 * meter * scale;
-const float FieldWidth = 4.05 * meter * scale;
+const float FieldLength = 8.05 * meter * scale;
+const float FieldWidth = 6.05 * meter * scale;
 
 const float LineHeight = 0.02 * meter;
 const float LineWidth = 0.02 * meter;

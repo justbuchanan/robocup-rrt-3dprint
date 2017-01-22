@@ -8,22 +8,35 @@ FieldThickness = 0.02*meter;
 Intersect = 0.001 * meter;
 Noderadius = LineWidth * 0.5;
 
+// bigger than usual, but print better than at actual scale
+WheelRadius = 40;
+WheelDepth = 20;
 
-module robot(pos, focused=false) {
-    color("black")
+module robot(pos, focused=false, start=false) {
+    // color("black")
     translate([pos[0], pos[1], 0]) {
         cylinder(r=RobotRadius, h=RobotHeight);
+        for (i = [0:4]) {
+            translate([RobotRadius,0,WheelRadius])
+            rotate([0, 90, 0])
+            color("green")
+            cylinder(r=WheelRadius, h=WheelDepth);
+        }
 
         // draw a target symbol on top of the destination robot
-        if (focused) {
-            f_height = LineHeight * 0.75;
+        if (focused || start) {
             translate([0,0,RobotHeight]) {
+                f_height = LineHeight * 0.75;
                 dr = 0.15;
-                for (r = [RobotRadius * dr*3, RobotRadius * dr*5, RobotRadius*dr]) {
-                    difference() {
-                        cylinder(r=r,h=f_height);
-                        cylinder(r=r - dr*RobotRadius,h=f_height*2);
+                if (focused) {
+                    for (r = [RobotRadius * dr*3, RobotRadius * dr*5, RobotRadius*dr]) {
+                        difference() {
+                            cylinder(r=r,h=f_height);
+                            cylinder(r=r - dr*RobotRadius,h=f_height*2);
+                        }
                     }
+                } else if (start) {
+                    cylinder(r=40, h=f_height);
                 }
             }
         }
@@ -67,10 +80,10 @@ scale(scaled_length / FieldLength) {
         }
 
         // start position
-        robot(StartPos);
+        robot(StartPos, start=true);
 
         // goal position
-        robot(GoalPos, true);
+        robot(GoalPos, focused=true);
 
         // all lines in the rrt
         for (l = RRT_Lines) {
@@ -86,5 +99,17 @@ scale(scaled_length / FieldLength) {
         for (i = [0:len(RRT_Solution)-2]) {
             line(RRT_Solution[i], RRT_Solution[i+1], 1.5);
         }
+
+
+        // translate([])
+        s = 12.5;
+        sx = 2;
+        gw = 1*meter;
+        gd = 0.415*meter;
+        translate([FieldWidth / 2, FieldLength-gd, 0])
+        scale([s*sx,s,s])
+        import("goal.stl");
+
     }
 }
+
